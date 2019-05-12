@@ -19,6 +19,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"time"
+
 	v1alpha1 "github.com/knative/eventing-sources/contrib/gcppubsub/pkg/apis/sources/v1alpha1"
 	scheme "github.com/knative/eventing-sources/contrib/gcppubsub/pkg/client/clientset/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -76,11 +78,16 @@ func (c *gcpPubSubSources) Get(name string, options v1.GetOptions) (result *v1al
 
 // List takes label and field selectors, and returns the list of GcpPubSubSources that match those selectors.
 func (c *gcpPubSubSources) List(opts v1.ListOptions) (result *v1alpha1.GcpPubSubSourceList, err error) {
+	var timeout time.Duration
+	if opts.TimeoutSeconds != nil {
+		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
+	}
 	result = &v1alpha1.GcpPubSubSourceList{}
 	err = c.client.Get().
 		Namespace(c.ns).
 		Resource("gcppubsubsources").
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Timeout(timeout).
 		Do().
 		Into(result)
 	return
@@ -88,11 +95,16 @@ func (c *gcpPubSubSources) List(opts v1.ListOptions) (result *v1alpha1.GcpPubSub
 
 // Watch returns a watch.Interface that watches the requested gcpPubSubSources.
 func (c *gcpPubSubSources) Watch(opts v1.ListOptions) (watch.Interface, error) {
+	var timeout time.Duration
+	if opts.TimeoutSeconds != nil {
+		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
+	}
 	opts.Watch = true
 	return c.client.Get().
 		Namespace(c.ns).
 		Resource("gcppubsubsources").
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Timeout(timeout).
 		Watch()
 }
 
@@ -150,10 +162,15 @@ func (c *gcpPubSubSources) Delete(name string, options *v1.DeleteOptions) error 
 
 // DeleteCollection deletes a collection of objects.
 func (c *gcpPubSubSources) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
+	var timeout time.Duration
+	if listOptions.TimeoutSeconds != nil {
+		timeout = time.Duration(*listOptions.TimeoutSeconds) * time.Second
+	}
 	return c.client.Delete().
 		Namespace(c.ns).
 		Resource("gcppubsubsources").
 		VersionedParams(&listOptions, scheme.ParameterCodec).
+		Timeout(timeout).
 		Body(options).
 		Do().
 		Error()

@@ -131,7 +131,7 @@ func (c *FakeGcpPubSubSources) DeleteCollection(options *v1.DeleteOptions, listO
 // Patch applies the patch and returns the patched gcpPubSubSource.
 func (c *FakeGcpPubSubSources) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.GcpPubSubSource, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(gcppubsubsourcesResource, c.ns, name, data, subresources...), &v1alpha1.GcpPubSubSource{})
+		Invokes(testing.NewPatchSubresourceAction(gcppubsubsourcesResource, c.ns, name, pt, data, subresources...), &v1alpha1.GcpPubSubSource{})
 
 	if obj == nil {
 		return nil, err
